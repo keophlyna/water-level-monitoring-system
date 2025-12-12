@@ -1,0 +1,237 @@
+[
+    {
+        "id": "79221dfc798c2a41",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "cd0a41ec7ae6027b",
+        "type": "mqtt in",
+        "z": "79221dfc798c2a41",
+        "name": "Water Level (cm)",
+        "topic": "tank/level",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "89822ba6b4ab6acf",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 400,
+        "y": 180,
+        "wires": [
+            [
+                "d8c69eee08af848f",
+                "0c0901ea0a083e85"
+            ]
+        ]
+    },
+    {
+        "id": "d8c69eee08af848f",
+        "type": "debug",
+        "z": "79221dfc798c2a41",
+        "name": "water level cm",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 660,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "0c0901ea0a083e85",
+        "type": "function",
+        "z": "79221dfc798c2a41",
+        "name": "function 1",
+        "func": "// Get values from context (to combine all 3 MQTT topics into one write)\nvar percentage = parseFloat(context.get('percentage') || 0);\nvar level_cm = parseFloat(context.get('level_cm') || 0);\nvar pump_status = context.get('pump_status') || 'OFF';\n\n// Update based on which topic triggered this\nif (msg.topic === 'tank/percentage') {\n    percentage = parseFloat(msg.payload);\n    context.set('percentage', percentage);\n} else if (msg.topic === 'tank/level') {\n    level_cm = parseFloat(msg.payload);\n    context.set('level_cm', level_cm);\n} else if (msg.topic === 'tank/pumpStatus') {\n    pump_status = msg.payload;\n    context.set('pump_status', pump_status);\n}\n\n// Prepare InfluxDB payload\n// Format: [fields_object, tags_object]\nmsg.payload = [\n    {\n        level_cm: level_cm,\n        percentage: percentage,\n        pump: pump_status === 'ON' ? 1 : 0\n    },\n    {\n        device: 'esp32',\n        location: 'home'\n    }\n];\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 920,
+        "y": 400,
+        "wires": [
+            [
+                "9f466735ccc509d2",
+                "97a9f8101310c988"
+            ]
+        ]
+    },
+    {
+        "id": "9f466735ccc509d2",
+        "type": "debug",
+        "z": "79221dfc798c2a41",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1240,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "97a9f8101310c988",
+        "type": "influxdb out",
+        "z": "79221dfc798c2a41",
+        "influxdb": "03fe54026a182a25",
+        "name": "",
+        "measurement": "level",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "ms",
+        "retentionPolicyV18Flux": "",
+        "org": "organisation",
+        "bucket": "bucket",
+        "x": 970,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "5d7d7783fa1ef32e",
+        "type": "mqtt in",
+        "z": "79221dfc798c2a41",
+        "name": "Water percentage",
+        "topic": "tank/percentage",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "89822ba6b4ab6acf",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 390,
+        "y": 440,
+        "wires": [
+            [
+                "5fac24193d78e8b4",
+                "0c0901ea0a083e85"
+            ]
+        ]
+    },
+    {
+        "id": "e47c5dd17e69aab2",
+        "type": "mqtt in",
+        "z": "79221dfc798c2a41",
+        "name": "Pump Status",
+        "topic": "tank/pumpStatus",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "89822ba6b4ab6acf",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 370,
+        "y": 540,
+        "wires": [
+            [
+                "be81b529c335601b",
+                "0c0901ea0a083e85"
+            ]
+        ]
+    },
+    {
+        "id": "5fac24193d78e8b4",
+        "type": "debug",
+        "z": "79221dfc798c2a41",
+        "name": "water percentage",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 610,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "be81b529c335601b",
+        "type": "debug",
+        "z": "79221dfc798c2a41",
+        "name": "pump status",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 610,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "89822ba6b4ab6acf",
+        "type": "mqtt-broker",
+        "name": "test.mosquitto.org:1883",
+        "broker": "test.mosquitto.org",
+        "port": 1883,
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "03fe54026a182a25",
+        "type": "influxdb",
+        "hostname": "127.0.0.1",
+        "port": 8086,
+        "protocol": "http",
+        "database": "water_tank",
+        "name": "",
+        "usetls": false,
+        "tls": "",
+        "influxdbVersion": "1.x",
+        "url": "http://localhost:8086",
+        "timeout": 10,
+        "rejectUnauthorized": true
+    },
+    {
+        "id": "23956265a19dcfc0",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-contrib-influxdb": "0.7.0"
+        }
+    }
+]
