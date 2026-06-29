@@ -158,7 +158,7 @@ The complete project report is included in this repository.
 
 If viewing on GitHub, you can open it directly from the repository:
 
-[Project Report](./WATER%20LEVEL%20MONITORING%20SYSTEM%20REPORT.pdf)
+[Project Report]([./WATER%20LEVEL%20MONITORING%20SYSTEM%20REPORT.pdf](https://docs.google.com/document/d/1xT2ycIWod0kWHgZJWN_VjIGu8yS-_d0iD5NoQ3psgIY/export?format=pdf))
 
 ---
 
